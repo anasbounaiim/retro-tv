@@ -80,6 +80,7 @@ input,
 }
 
 .garage-loading-ready {
+  background-color: transparent;
   background-image: none;
 }
 
