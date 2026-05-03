@@ -14,13 +14,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://retro-tv-self.vercel.app"),
   title: "Moroccan Retro TV Experience",
-  description: "Experience a Moroccan nostalgic retro TV interface ",
-  other: {
-    'Content-Security-Policy':
-      "frame-src https://www.youtube.com https://youtube.com; connect-src https://www.youtube.com https://youtube.com 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:;",
+  description: "Experience a Moroccan nostalgic retro TV interface",
+  openGraph: {
+    title: "Moroccan Retro TV Experience",
+    description: "Experience a Moroccan nostalgic retro TV interface",
+    url: "https://retro-tv-self.vercel.app",
+    siteName: "Moroccan Retro TV Experience",
+    images: [
+      {
+        url: "/assets/tv/tv off - Copie.png",
+        width: 1200,
+        height: 630,
+        alt: "Moroccan Retro TV Experience",
+      },
+    ],
+    type: "website",
   },
 };
+
 
 export default function RootLayout({
   children,
