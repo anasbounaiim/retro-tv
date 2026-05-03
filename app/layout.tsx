@@ -32,6 +32,14 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link
+          as="image"
+          fetchPriority="high"
+          href="/assets/garage_texture_4k.png"
+          rel="preload"
+        />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

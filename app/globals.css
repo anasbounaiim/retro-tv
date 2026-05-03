@@ -71,7 +71,11 @@ input,
 /* ================= GARAGE LOADING ================= */
 .garage-loading {
   isolation: isolate;
-  background: transparent;
+  background-color: #050505;
+  background-image: url("/assets/garage_texture_4k.png");
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
   pointer-events: none;
 }
 
