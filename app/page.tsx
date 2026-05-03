@@ -684,7 +684,9 @@ export default function Home() {
           <div
             aria-label="Loading retro TV room"
             aria-live="polite"
-            className="garage-loading pointer-events-none fixed inset-0 z-[220] overflow-hidden"
+            className={`garage-loading pointer-events-none fixed inset-0 z-[220] overflow-hidden ${
+              isGarageAnimationStarted ? 'garage-loading-ready' : ''
+            }`}
             role="status"
           >
             <img

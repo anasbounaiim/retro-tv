@@ -79,6 +79,10 @@ input,
   pointer-events: none;
 }
 
+.garage-loading-ready {
+  background-image: none;
+}
+
 .garage-loading-curtain {
   position: absolute;
   left: 0;
