@@ -6,6 +6,13 @@ import { useYouTubePlayer } from './hooks/useYouTubePlayer';
 import { suppressTrackingWarnings } from './lib/suppressWarnings';
 
 const CHANNEL_SOURCES = [
+  { type: 'playlist' as const, id: 'PL12maSalsZwochzJ4WV7IDq9SKjFq6PH3', weight: 2, cooldown: 4 },
+  { type: 'playlist' as const, id: 'PL7j8fIfWProPmvmURRv_0xYdzwVELYh5R', weight: 2, cooldown: 4 },
+  { type: 'playlist' as const, id: 'PLkDfh3JIbsF0OueucpLlKY9FBfXwzGiby', weight: 2, cooldown: 4 },
+  { type: 'playlist' as const, id: 'PLQy1j8Ed7GZWX5CXY5JRUfWT_HV86YWKQ', weight: 2, cooldown: 4 },
+  { type: 'playlist' as const, id: 'PLbt09tWqepBRYcl3jIaAUhLKEpNjGSf2B', weight: 2, cooldown: 4 },
+  { type: 'playlist' as const, id: 'PLepvMV5u2rq-hynJpSFhJE2ni2Tdg7FAa', weight: 2, cooldown: 4 },
+  { type: 'playlist' as const, id: 'PLWSdaAk9w6V-XJn4R0pigf3xSJTEC9OwS', weight: 2, cooldown: 4 },
   { type: 'video' as const, id: '8O9nwEEwv2Y' },
   { type: 'video' as const, id: 'NjQpkbIzdlU' },
   { type: 'playlist' as const, id: 'PLMRKdK25AuPVjHl9Kdb-gkBy0Cm7Zi2xo' },
@@ -24,9 +31,6 @@ const CHANNEL_SOURCES = [
   { type: 'playlist' as const, id: 'PLKBichqIpPt5qsnwphJtfr8WEmVw89bM1' },
   { type: 'playlist' as const, id: 'PLAHouvaC4CkOnubOV5uCev8pa7iFYYhmc' },
   { type: 'playlist' as const, id: 'PLlVlyGVtvuVniS7jx4DyESaKRUANIzyhE' },
-  { type: 'playlist' as const, id: 'PLbt09tWqepBRYcl3jIaAUhLKEpNjGSf2B' },
-  { type: 'playlist' as const, id: 'PLepvMV5u2rq-hynJpSFhJE2ni2Tdg7FAa' },
-  { type: 'playlist' as const, id: 'PLWSdaAk9w6V-XJn4R0pigf3xSJTEC9OwS' },
 ];
 const YOUTUBE_CHROME_FADE_MS = 4200;
 const TUNING_STATIC_FALLBACK_MS = 9500;

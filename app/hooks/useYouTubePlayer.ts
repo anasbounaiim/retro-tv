@@ -32,8 +32,8 @@ interface YouTubePlayerOptions {
 }
 
 type YouTubeChannelSource =
-  | { type: 'playlist'; id: string }
-  | { type: 'video'; id: string };
+  | { type: 'playlist'; id: string; weight?: number; cooldown?: number }
+  | { type: 'video'; id: string; weight?: number; cooldown?: number };
 
 function normalizeSources(input: string | string[] | YouTubeChannelSource[]): YouTubeChannelSource[] {
   if (!Array.isArray(input)) {
@@ -88,6 +88,21 @@ function shuffleSources(sources: YouTubeChannelSource[]) {
   return shuffledSources;
 }
 
+function getWeightedSources(sources: YouTubeChannelSource[]) {
+  return sources.flatMap((source) => {
+    const weight = Math.max(1, Math.floor(source.weight ?? 1));
+    return Array.from({ length: weight }, () => source);
+  });
+}
+
+function getSourceCooldown(source: YouTubeChannelSource, sourceCount: number) {
+  return Math.max(0, Math.min(source.cooldown ?? sourceCount - 1, sourceCount - 1));
+}
+
+function getHighlightedSources(sources: YouTubeChannelSource[]) {
+  return sources.filter((source) => (source.weight ?? 1) > 1);
+}
+
 export function useYouTubePlayer(
   channelInput: string | string[] | YouTubeChannelSource[],
   options: YouTubePlayerOptions = {}
@@ -108,6 +123,8 @@ export function useYouTubePlayer(
   const activeVideoKeyRef = useRef<string | null>(null);
   const lastRandomizedVideoRef = useRef<string | null>(null);
   const channelSourceQueueRef = useRef<YouTubeChannelSource[]>([]);
+  const recentlyPlayedSourceKeysRef = useRef<string[]>([]);
+  const shouldStartWithHighlightedSourcesRef = useRef(true);
   const isTuningRef = useRef(false);
   const tuningIdRef = useRef(0);
   const channelSources = useMemo(
@@ -141,6 +158,8 @@ export function useYouTubePlayer(
     activeVideoKeyRef.current = null;
     lastRandomizedVideoRef.current = null;
     channelSourceQueueRef.current = [];
+    recentlyPlayedSourceKeysRef.current = [];
+    shouldStartWithHighlightedSourcesRef.current = true;
     isTuningRef.current = false;
     setPlayer(null);
     setIsReady(false);
@@ -192,11 +211,24 @@ export function useYouTubePlayer(
 
     if (channelSourceQueueRef.current.length === 0) {
       const activeKey = activeChannelSourceKeyRef.current;
-      const availableSources =
-        channelSources.length > 1 && activeKey
-          ? channelSources.filter((source) => getSourceKey(source) !== activeKey)
-          : channelSources;
-      const nextQueue = shuffleSources(availableSources);
+      const highlightedSources = getHighlightedSources(channelSources);
+      const shouldUseHighlightedStart =
+        shouldStartWithHighlightedSourcesRef.current && highlightedSources.length > 0;
+      const nextQueue = shouldUseHighlightedStart
+        ? shuffleSources(highlightedSources)
+        : shuffleSources(getWeightedSources(channelSources));
+
+      if (shouldUseHighlightedStart) {
+        shouldStartWithHighlightedSourcesRef.current = false;
+      }
+
+      if (
+        activeKey &&
+        nextQueue.length > 1 &&
+        getSourceKey(nextQueue[0]) === activeKey
+      ) {
+        nextQueue.push(nextQueue.shift() as YouTubeChannelSource);
+      }
 
       channelSourceQueueRef.current = nextQueue;
     }
@@ -218,7 +250,36 @@ export function useYouTubePlayer(
       }
     }
 
-    return channelSourceQueueRef.current.shift() ?? null;
+    const recentSourceKeys = recentlyPlayedSourceKeysRef.current;
+    const isSourcePastCooldown = (source: YouTubeChannelSource) => {
+      const sourceKey = getSourceKey(source);
+      const lastPlayedIndex = recentSourceKeys.lastIndexOf(sourceKey);
+
+      if (lastPlayedIndex === -1) return true;
+
+      const playsSinceLastUse = recentSourceKeys.length - lastPlayedIndex - 1;
+      return playsSinceLastUse >= getSourceCooldown(source, channelSources.length);
+    };
+    const nextFreshSourceIndex = channelSourceQueueRef.current.findIndex(
+      isSourcePastCooldown
+    );
+
+    const nextSource =
+      nextFreshSourceIndex > 0
+        ? channelSourceQueueRef.current.splice(nextFreshSourceIndex, 1)[0]
+        : channelSourceQueueRef.current.shift() ?? null;
+
+    if (nextSource) {
+      const nextSourceKey = getSourceKey(nextSource);
+      const recentSourceLimit = Math.max(0, channelSources.length - 1);
+
+      recentlyPlayedSourceKeysRef.current = [
+        ...recentSourceKeys.filter((sourceKey) => sourceKey !== nextSourceKey),
+        nextSourceKey,
+      ].slice(-recentSourceLimit);
+    }
+
+    return nextSource;
   }, [channelSources]);
 
   const tuneToRandomChannel = useCallback((target = playerRef.current) => {
@@ -268,6 +329,8 @@ export function useYouTubePlayer(
   useEffect(() => {
     channelSourceQueueRef.current = [];
     activeChannelSourceKeyRef.current = null;
+    recentlyPlayedSourceKeysRef.current = [];
+    shouldStartWithHighlightedSourcesRef.current = true;
   }, [channelSources]);
 
   const updateCurrentTitle = useCallback((target: YouTubePlayer) => {
