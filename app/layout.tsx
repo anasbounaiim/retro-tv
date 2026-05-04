@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: "Moroccan Retro TV Experience",
     images: [
       {
-        url: "https://retro-tv-self.vercel.app/assets/tv/tv%20off.png",
+        url: "https://retro-tv-self.vercel.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "Moroccan Retro TV Experience",
