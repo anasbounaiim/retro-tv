@@ -31,6 +31,8 @@ interface YouTubePlayerOptions {
   randomStartPositions?: boolean;
 }
 
+const ERROR_SKIP_DELAY_MS = 900;
+
 type YouTubeChannelSource =
   | { type: 'playlist'; id: string; weight?: number; cooldown?: number }
   | { type: 'video'; id: string; weight?: number; cooldown?: number };
@@ -436,8 +438,14 @@ export function useYouTubePlayer(
             };
             const errorMsg = errorMessages[event.data] || 'Unknown error';
             setError(`YouTube Error: ${errorMsg}`);
+            setCurrentTitle('');
+            console.warn('YouTube Player Error, skipping channel:', event.data);
 
-            console.warn('YouTube Player Error:', event.data);
+            scheduleTimeout(() => {
+              if (event.target !== playerRef.current || !isReadyRef.current) return;
+
+              tuneToRandomChannel(event.target);
+            }, ERROR_SKIP_DELAY_MS);
           },
         },
       });
